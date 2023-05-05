@@ -1,0 +1,23 @@
+﻿<assemblies timestamp="05/05/2023 13:09:30">
+  <assembly name="C:\some\path\to\test-assembly-file.dll" run-date="2023-05-05" run-time="13:09:30" total="1" passed="0" failed="1" skipped="0" time="1524.428" errors="0">
+    <errors />
+    <collection total="2" passed="1" failed="1" skipped="0" name="Test collection for Some.Full.Class.Name" time="408.091">
+      <test name="Some.Full.Class.Name.Test_Method" type="Some.Full.Class.Name" method="Test_Method" time="204.0487180" result="Fail">
+        <output>Some output data</output>
+        <failure>
+          <message>some message</message>
+          <stack-trace>stack trace</stack-trace>
+        </failure>
+        <traits>
+          <trait name="Epic" value="some jira issue" />
+        </traits>
+      </test>
+        <test name="Some.Full.Class.Name.Another_Test_Method" type="Some.Full.Class.Name" method="Another_Test_Method" time="0.2350974" result="Pass">
+        <output>Another output data</output>
+        <traits>
+          <trait name="Epic" value="another jira issue" />
+        </traits>
+      </test>
+    </collection>
+  </assembly>
+</assemblies>
