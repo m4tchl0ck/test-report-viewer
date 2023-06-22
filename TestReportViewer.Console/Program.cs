@@ -1,23 +1,67 @@
 using TestReportViewer.Data.Memory;
 using TestReportViewer.xUnitTestReportLoader;
 
-if (args.Length == 0)
+const string FileArg = "-f";
+const string DirectoryArg = "-d";
+
+async Task LoadFromDirectory(Loader loader, string reportsPath, string filePattern = "*.*")
 {
-    Console.Error.WriteLine("Path to report file required");
-    return;
+    if (!Directory.Exists(reportsPath))
+    {
+        HandleWrongArgument("Directory not found");
+    }
+
+    foreach (var reportPath in Directory.GetFiles(reportsPath, filePattern))
+    {
+        await LoadFromFile(loader, reportPath);
+    }
 }
 
-var reportPath = args[0];
-if (!File.Exists(reportPath))
+async Task LoadFromFile(Loader loader, string reportPath)
 {
-    Console.Error.WriteLine($"{reportPath} do not exists");
-    return;
+    if (!File.Exists(reportPath))
+    {
+        HandleWrongArgument("File not found");
+    }
+
+    var reportStream = File.OpenRead(reportPath);
+    await loader.Load(reportStream);
+}
+
+void HandleWrongArgument(string message = "wrong parameter")
+{
+    Console.Error.WriteLine(@$"
+{message}
+
+parameters
+{FileArg} <file>
+{DirectoryArg} <directory> <patter>"
+    );
+    throw new ArgumentException();
+}
+
+if (args.Length < 2)
+{
+    HandleWrongArgument();
 }
 
 var storage = new MemoryStorage();
 var loader = new Loader(storage);
-var reportStream = File.OpenRead(reportPath);
-await loader.Load(reportStream);
+
+var operation = args[0];
+switch (operation)
+{
+    case FileArg:
+        await LoadFromFile(loader, args[1]);
+        break;
+    case DirectoryArg:
+        await LoadFromDirectory(loader, args[1], args[2]);
+        break;
+    default:
+        HandleWrongArgument();
+        break;
+}
+
 
 storage.Get()
     .Where(testExecution => testExecution.Result == "Fail")
