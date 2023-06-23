@@ -94,7 +94,7 @@ switch (operation)
         await LoadFromZipFile(loader, args[1], args[2]);
         break;
     case ZipDirectoryArg:
-        await LoadFromZipDirectory(loader, args[1], args[2] args[3]);
+        await LoadFromZipDirectory(loader, args[1], args[2], args[3]);
         break;
     default:
         HandleWrongArgument();
@@ -105,7 +105,12 @@ switch (operation)
 storage.Get()
     .Where(testExecution => testExecution.Result == "Fail")
     .ToList()
-    .ForEach(testExecution => Console.WriteLine($"{testExecution.Name.PadRight(100)} | {testExecution.Result.PadRight(6)} | {testExecution.ExecutionTime.ToString().PadRight(10)}"));
+    .ForEach(testExecution =>
+    {
+        Console.WriteLine(
+                $"{testExecution.Name.PadRight(100)} | {testExecution.Result.PadRight(6)} | {testExecution.ExecutionTime.ToString().PadRight(10)}");
+        Console.WriteLine(testExecution.Failure);
+    });
 
 
 Console.ReadKey();
