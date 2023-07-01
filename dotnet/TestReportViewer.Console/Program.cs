@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using TestReportViewer.Console;
 using TestReportViewer.Data.Memory;
 using TestReportViewer.xUnitTestReportLoader;
 
@@ -27,7 +28,7 @@ async Task LoadFromZipFile(Loader loader, string zipFilePath, string reportFiles
     {
         HandleWrongArgument("File not found");
     }
-    
+
     using var zip = ZipFile.OpenRead(zipFilePath);
     var reportsPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     zip.ExtractToDirectory(reportsPath);
@@ -44,20 +45,10 @@ async Task LoadFromDirectory(Loader loader, string reportsPath, string reportFil
 
     foreach (var reportPath in Directory.GetFiles(reportsPath, reportFilesPattern))
     {
-        await LoadFromFile(loader, reportPath);
+        await new FileLoader().LoadFromFile(loader, reportPath);
     }
 }
 
-async Task LoadFromFile(Loader loader, string reportPath)
-{
-    if (!File.Exists(reportPath))
-    {
-        HandleWrongArgument("File not found");
-    }
-
-    var reportStream = File.OpenRead(reportPath);
-    await loader.Load(reportStream);
-}
 
 void HandleWrongArgument(string message = "wrong parameter")
 {
@@ -81,26 +72,32 @@ if (args.Length < 2)
 var storage = new MemoryStorage();
 var loader = new Loader(storage);
 
-var operation = args[0];
-switch (operation)
+try
 {
-    case FileArg:
-        await LoadFromFile(loader, args[1]);
-        break;
-    case DirectoryArg:
-        await LoadFromDirectory(loader, args[1], args[2]);
-        break;
-    case ZipFileArg:
-        await LoadFromZipFile(loader, args[1], args[2]);
-        break;
-    case ZipDirectoryArg:
-        await LoadFromZipDirectory(loader, args[1], args[2], args[3]);
-        break;
-    default:
-        HandleWrongArgument();
-        break;
+    var operation = args[0];
+    switch (operation)
+    {
+        case FileArg:
+            await new FileLoader().Load(loader, args[1]);
+            break;
+        case DirectoryArg:
+            await LoadFromDirectory(loader, args[1], args[2]);
+            break;
+        case ZipFileArg:
+            await LoadFromZipFile(loader, args[1], args[2]);
+            break;
+        case ZipDirectoryArg:
+            await LoadFromZipDirectory(loader, args[1], args[2], args[3]);
+            break;
+        default:
+            HandleWrongArgument();
+            break;
+    }
 }
-
+catch (Exception e)
+{
+    HandleWrongArgument(e.Message);
+}
 
 var executions = storage.Get()
     .Where(testExecution => testExecution.Result == "Fail")
@@ -113,6 +110,6 @@ executions
     .ForEach(testExecution =>
     {
         Console.WriteLine(
-                $"{testExecution.ExecutedTimeStamp} | {testExecution.Name.PadRight(maxNameLength)} | {testExecution.Result} | {testExecution.ExecutionTime }");
+                $"{testExecution.ExecutedTimeStamp} | {testExecution.Name.PadRight(maxNameLength)} | {testExecution.Result} | {testExecution.ExecutionTime}");
         Console.WriteLine(testExecution.Failure);
     });
