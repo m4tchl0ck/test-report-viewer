@@ -7,19 +7,6 @@ const string DirectoryArg = "-d";
 const string ZipFileArg = "-zf";
 const string ZipDirectoryArg = "-zd";
 
-async Task LoadFromZipDirectory(Loader loader, string zipFilesPath, string zipFilesPattern, string reportFilesPattern = "*.*")
-{
-    if (!Directory.Exists(zipFilesPath))
-    {
-        HandleWrongArgument("Directory not found");
-    }
-
-    foreach (var zipFilePath in Directory.GetFiles(zipFilesPath, zipFilesPattern))
-    {
-        await new ZipFileLoader(new DirectoryLoader(new FileLoader())).Load(loader, zipFilePath, reportFilesPattern);
-    }
-}
-
 void HandleWrongArgument(string message = "wrong parameter")
 {
     Console.Error.WriteLine(@$"
@@ -57,7 +44,7 @@ try
             await new ZipFileLoader(new DirectoryLoader(new FileLoader())).Load(loader, args[1], args[2]);
             break;
         case ZipDirectoryArg:
-            await LoadFromZipDirectory(loader, args[1], args[2], args[3]);
+            await new ZipDirectoryLoader(new ZipFileLoader(new DirectoryLoader(new FileLoader()))).Load(loader, args[1], args[2], args[3]);
             break;
         default:
             HandleWrongArgument();
