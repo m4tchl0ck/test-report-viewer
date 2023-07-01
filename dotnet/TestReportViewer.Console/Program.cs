@@ -1,4 +1,3 @@
-using System.IO.Compression;
 using TestReportViewer.Console;
 using TestReportViewer.Data.Memory;
 using TestReportViewer.xUnitTestReportLoader;
@@ -17,25 +16,9 @@ async Task LoadFromZipDirectory(Loader loader, string zipFilesPath, string zipFi
 
     foreach (var zipFilePath in Directory.GetFiles(zipFilesPath, zipFilesPattern))
     {
-        await LoadFromZipFile(loader, zipFilePath, reportFilesPattern);
+        await new ZipFileLoader(new DirectoryLoader(new FileLoader())).Load(loader, zipFilePath, reportFilesPattern);
     }
-
 }
-
-async Task LoadFromZipFile(Loader loader, string zipFilePath, string reportFilesPattern = "*.*")
-{
-    if (!File.Exists(zipFilePath))
-    {
-        HandleWrongArgument("File not found");
-    }
-
-    using var zip = ZipFile.OpenRead(zipFilePath);
-    var reportsPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-    zip.ExtractToDirectory(reportsPath);
-    await new DirectoryLoader(new FileLoader()).Load(loader, reportsPath, reportFilesPattern);
-    Directory.Delete(reportsPath, true);
-}
-
 
 void HandleWrongArgument(string message = "wrong parameter")
 {
@@ -71,7 +54,7 @@ try
             await new DirectoryLoader(new FileLoader()).Load(loader, args[1], args[2]);
             break;
         case ZipFileArg:
-            await LoadFromZipFile(loader, args[1], args[2]);
+            await new ZipFileLoader(new DirectoryLoader(new FileLoader())).Load(loader, args[1], args[2]);
             break;
         case ZipDirectoryArg:
             await LoadFromZipDirectory(loader, args[1], args[2], args[3]);
