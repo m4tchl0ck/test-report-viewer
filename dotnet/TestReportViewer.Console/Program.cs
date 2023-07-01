@@ -32,21 +32,8 @@ async Task LoadFromZipFile(Loader loader, string zipFilePath, string reportFiles
     using var zip = ZipFile.OpenRead(zipFilePath);
     var reportsPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     zip.ExtractToDirectory(reportsPath);
-    await LoadFromDirectory(loader, reportsPath, reportFilesPattern);
+    await new DirectoryLoader(new FileLoader()).Load(loader, reportsPath, reportFilesPattern);
     Directory.Delete(reportsPath, true);
-}
-
-async Task LoadFromDirectory(Loader loader, string reportsPath, string reportFilesPattern = "*.*")
-{
-    if (!Directory.Exists(reportsPath))
-    {
-        HandleWrongArgument("Directory not found");
-    }
-
-    foreach (var reportPath in Directory.GetFiles(reportsPath, reportFilesPattern))
-    {
-        await new FileLoader().LoadFromFile(loader, reportPath);
-    }
 }
 
 
@@ -81,7 +68,7 @@ try
             await new FileLoader().Load(loader, args[1]);
             break;
         case DirectoryArg:
-            await LoadFromDirectory(loader, args[1], args[2]);
+            await new DirectoryLoader(new FileLoader()).Load(loader, args[1], args[2]);
             break;
         case ZipFileArg:
             await LoadFromZipFile(loader, args[1], args[2]);
