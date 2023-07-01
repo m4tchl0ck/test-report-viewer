@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestReportViewer.Data", "Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestReportViewer.Console", "TestReportViewer.Console\TestReportViewer.Console.csproj", "{E9F733C7-E14C-4600-82CB-D176A02B21E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestReportViewer.Data.PostgreSQL", "TestReportViewer.Data.PostgreSQL\TestReportViewer.Data.PostgreSQL.csproj", "{D7AC78FD-64C5-4E33-84F9-4B20528CE1FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E9F733C7-E14C-4600-82CB-D176A02B21E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9F733C7-E14C-4600-82CB-D176A02B21E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9F733C7-E14C-4600-82CB-D176A02B21E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7AC78FD-64C5-4E33-84F9-4B20528CE1FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7AC78FD-64C5-4E33-84F9-4B20528CE1FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7AC78FD-64C5-4E33-84F9-4B20528CE1FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7AC78FD-64C5-4E33-84F9-4B20528CE1FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
