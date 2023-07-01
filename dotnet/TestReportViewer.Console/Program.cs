@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using TestReportViewer.Console;
+using TestReportViewer.Data;
 using TestReportViewer.Data.Memory;
 using TestReportViewer.xUnitTestReportLoader;
 
@@ -6,6 +9,21 @@ const string FileArg = "-f";
 const string DirectoryArg = "-d";
 const string ZipFileArg = "-zf";
 const string ZipDirectoryArg = "-zd";
+
+using var host = Host
+    .CreateDefaultBuilder()
+    .ConfigureServices(services =>
+        {
+            services
+                .AddSingleton<MemoryStorage>()
+                .AddSingleton<IStorage>(sp => sp.GetRequiredService<MemoryStorage>())
+                .AddTransient<Loader>()
+                .AddTransient<FileLoader>()
+                .AddTransient<DirectoryLoader>()
+                .AddTransient<ZipFileLoader>()
+                .AddTransient<ZipDirectoryLoader>();
+        })
+    .Build();
 
 void HandleWrongArgument(string message = "wrong parameter")
 {
@@ -21,13 +39,12 @@ parameters
     throw new ArgumentException();
 }
 
+await host.StartAsync();
+
 if (args.Length < 2)
 {
     HandleWrongArgument();
 }
-
-var storage = new MemoryStorage();
-var loader = new Loader(storage);
 
 try
 {
@@ -35,16 +52,16 @@ try
     switch (operation)
     {
         case FileArg:
-            await new FileLoader().Load(loader, args[1]);
+            await host.Services.GetRequiredService<FileLoader>().Load(args[1]);
             break;
         case DirectoryArg:
-            await new DirectoryLoader(new FileLoader()).Load(loader, args[1], args[2]);
+            await host.Services.GetRequiredService<DirectoryLoader>().Load(args[1], args[2]);
             break;
         case ZipFileArg:
-            await new ZipFileLoader(new DirectoryLoader(new FileLoader())).Load(loader, args[1], args[2]);
+            await host.Services.GetRequiredService<ZipFileLoader>().Load(args[1], args[2]);
             break;
         case ZipDirectoryArg:
-            await new ZipDirectoryLoader(new ZipFileLoader(new DirectoryLoader(new FileLoader()))).Load(loader, args[1], args[2], args[3]);
+            await host.Services.GetRequiredService<ZipDirectoryLoader>().Load(args[1], args[2], args[3]);
             break;
         default:
             HandleWrongArgument();
@@ -56,7 +73,7 @@ catch (Exception e)
     HandleWrongArgument(e.Message);
 }
 
-var executions = storage.Get()
+var executions = host.Services.GetRequiredService<MemoryStorage>().Get()
     .Where(testExecution => testExecution.Result == "Fail")
     .OrderBy(testExecution => testExecution.ExecutedTimeStamp)
     .ToList();

@@ -11,7 +11,7 @@ internal class ZipDirectoryLoader
         _zipFileLoader = zipFileLoader;
     }
 
-    public async Task Load(Loader loader, string zipFilesPath, string zipFilesPattern,
+    public async Task Load(string zipFilesPath, string zipFilesPattern,
         string reportFilesPattern = "*.*")
     {
         if (!Directory.Exists(zipFilesPath))
@@ -21,7 +21,7 @@ internal class ZipDirectoryLoader
 
         foreach (var zipFilePath in Directory.GetFiles(zipFilesPath, zipFilesPattern))
         {
-            await _zipFileLoader.Load(loader, zipFilePath,
+            await _zipFileLoader.Load(zipFilePath,
                 reportFilesPattern);
         }
     }

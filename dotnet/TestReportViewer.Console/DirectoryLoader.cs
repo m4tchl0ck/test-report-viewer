@@ -11,7 +11,7 @@ internal class DirectoryLoader
         _fileLoader = fileLoader;
     }
 
-    public async Task Load(Loader loader, string reportsPath, string reportFilesPattern = "*.*")
+    public async Task Load(string reportsPath, string reportFilesPattern = "*.*")
     {
         if (!Directory.Exists(reportsPath))
         {
@@ -20,7 +20,7 @@ internal class DirectoryLoader
 
         foreach (var reportPath in Directory.GetFiles(reportsPath, reportFilesPattern))
         {
-            await _fileLoader.Load(loader, reportPath);
+            await _fileLoader.Load(reportPath);
         }
     }
 }
