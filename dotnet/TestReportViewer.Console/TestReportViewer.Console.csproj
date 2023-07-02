@@ -5,6 +5,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>c1071620-db62-42ed-8fff-e85a98a0ebde</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TestReportViewer.Data.PostgreSQL\TestReportViewer.Data.PostgreSQL.csproj" />
     <ProjectReference Include="..\TestReportViewer.Data\TestReportViewer.Data.csproj" />
     <ProjectReference Include="..\TestReportViewer.xUnitTestReportLoader\TestReportViewer.xUnitTestReportLoader.csproj" />
   </ItemGroup>

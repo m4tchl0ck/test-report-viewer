@@ -1,8 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TestReportViewer.Console;
-using TestReportViewer.Data;
-using TestReportViewer.Data.Memory;
+using TestReportViewer.Data.PostgreSQL;
 using TestReportViewer.xUnitTestReportLoader;
 
 const string FileArg = "-f";
@@ -12,17 +12,22 @@ const string ZipDirectoryArg = "-zd";
 
 using var host = Host
     .CreateDefaultBuilder()
-    .ConfigureServices(services =>
-        {
-            services
-                .AddSingleton<MemoryStorage>()
-                .AddSingleton<IStorage>(sp => sp.GetRequiredService<MemoryStorage>())
-                .AddTransient<Loader>()
-                .AddTransient<FileLoader>()
-                .AddTransient<DirectoryLoader>()
-                .AddTransient<ZipFileLoader>()
-                .AddTransient<ZipDirectoryLoader>();
-        })
+    .ConfigureAppConfiguration(configuration =>
+    {
+        configuration
+            .AddUserSecrets(typeof(Program).Assembly, true)
+            .AddEnvironmentVariables();
+    })
+    .ConfigureServices((hostContext, services) =>
+    {
+        services
+            .AddPostgreSQL(hostContext.Configuration)
+            .AddTransient<Loader>()
+            .AddTransient<FileLoader>()
+            .AddTransient<DirectoryLoader>()
+            .AddTransient<ZipFileLoader>()
+            .AddTransient<ZipDirectoryLoader>();
+    })
     .Build();
 
 void HandleWrongArgument(string message = "wrong parameter")
@@ -73,17 +78,17 @@ catch (Exception e)
     throw;
 }
 
-var executions = host.Services.GetRequiredService<MemoryStorage>().Get()
-    .Where(testExecution => testExecution.Result == "Fail")
-    .OrderBy(testExecution => testExecution.ExecutedTimeStamp)
-    .ToList();
+//var executions = host.Services.GetRequiredService<MemoryStorage>().Get()
+//    .Where(testExecution => testExecution.Result == "Fail")
+//    .OrderBy(testExecution => testExecution.ExecutedTimeStamp)
+//    .ToList();
 
-var maxNameLength = executions.Max(testExecution => testExecution.Name.Length);
+//var maxNameLength = executions.Max(testExecution => testExecution.Name.Length);
 
-executions
-    .ForEach(testExecution =>
-    {
-        Console.WriteLine(
-                $"{testExecution.ExecutedTimeStamp} | {testExecution.Name.PadRight(maxNameLength)} | {testExecution.Result} | {testExecution.ExecutionTime}");
-        Console.WriteLine(testExecution.Failure);
-    });
+//executions
+//    .ForEach(testExecution =>
+//    {
+//        Console.WriteLine(
+//                $"{testExecution.ExecutedTimeStamp} | {testExecution.Name.PadRight(maxNameLength)} | {testExecution.Result} | {testExecution.ExecutionTime}");
+//        Console.WriteLine(testExecution.Failure);
+//    });
