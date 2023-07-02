@@ -36,7 +36,6 @@ parameters
 {ZipFileArg} <file> <patter>
 {ZipDirectoryArg} <directory> <zip files pattern> <report files pattern>
 ");
-    throw new ArgumentException();
 }
 
 await host.StartAsync();
@@ -71,6 +70,7 @@ try
 catch (Exception e)
 {
     HandleWrongArgument(e.Message);
+    throw;
 }
 
 var executions = host.Services.GetRequiredService<MemoryStorage>().Get()
