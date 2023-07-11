@@ -5,8 +5,23 @@ using TestReportViewer.xUnitTestReportLoader;
 const string FileArg = "-f";
 const string DirectoryArg = "-d";
 const string ZipFileArg = "-zf";
+const string ZipDirectoryArg = "-zd";
 
-async Task LoadFromZipFile(Loader loader, string zipFilePath, string filePattern = "*.*")
+async Task LoadFromZipDirectory(Loader loader, string zipFilesPath, string zipFilesPattern, string reportFilesPattern = "*.*")
+{
+    if (!Directory.Exists(zipFilesPath))
+    {
+        HandleWrongArgument("Directory not found");
+    }
+
+    foreach (var zipFilePath in Directory.GetFiles(zipFilesPath, zipFilesPattern))
+    {
+        await LoadFromZipFile(loader, zipFilePath, reportFilesPattern);
+    }
+
+}
+
+async Task LoadFromZipFile(Loader loader, string zipFilePath, string reportFilesPattern = "*.*")
 {
     if (!File.Exists(zipFilePath))
     {
@@ -16,18 +31,18 @@ async Task LoadFromZipFile(Loader loader, string zipFilePath, string filePattern
     using var zip = ZipFile.OpenRead(zipFilePath);
     var reportsPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     zip.ExtractToDirectory(reportsPath);
-    await LoadFromDirectory(loader, reportsPath, filePattern);
-    Directory.Delete(reportsPath);
+    await LoadFromDirectory(loader, reportsPath, reportFilesPattern);
+    Directory.Delete(reportsPath, true);
 }
 
-async Task LoadFromDirectory(Loader loader, string reportsPath, string filePattern = "*.*")
+async Task LoadFromDirectory(Loader loader, string reportsPath, string reportFilesPattern = "*.*")
 {
     if (!Directory.Exists(reportsPath))
     {
         HandleWrongArgument("Directory not found");
     }
 
-    foreach (var reportPath in Directory.GetFiles(reportsPath, filePattern))
+    foreach (var reportPath in Directory.GetFiles(reportsPath, reportFilesPattern))
     {
         await LoadFromFile(loader, reportPath);
     }
@@ -51,9 +66,10 @@ void HandleWrongArgument(string message = "wrong parameter")
 
 parameters
 {FileArg} <file>
-{DirectoryArg} <directory> <patter>
-{ZipFileArg} <file> <patter>"
-    );
+{DirectoryArg} <directory> <report files patter>
+{ZipFileArg} <file> <patter>
+{ZipDirectoryArg} <directory> <zip files pattern> <report files pattern>
+");
     throw new ArgumentException();
 }
 
@@ -76,6 +92,9 @@ switch (operation)
         break;
     case ZipFileArg:
         await LoadFromZipFile(loader, args[1], args[2]);
+        break;
+    case ZipDirectoryArg:
+        await LoadFromZipDirectory(loader, args[1], args[2] args[3]);
         break;
     default:
         HandleWrongArgument();
