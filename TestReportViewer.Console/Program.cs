@@ -102,15 +102,17 @@ switch (operation)
 }
 
 
-storage.Get()
+var executions = storage.Get()
     .Where(testExecution => testExecution.Result == "Fail")
-    .ToList()
+    .OrderBy(testExecution => testExecution.ExecutedTimeStamp)
+    .ToList();
+
+var maxNameLength = executions.Max(testExecution => testExecution.Name.Length);
+
+executions
     .ForEach(testExecution =>
     {
         Console.WriteLine(
-                $"{testExecution.Name.PadRight(100)} | {testExecution.Result.PadRight(6)} | {testExecution.ExecutionTime.ToString().PadRight(10)}");
+                $"{testExecution.ExecutedTimeStamp} | {testExecution.Name.PadRight(maxNameLength)} | {testExecution.Result} | {testExecution.ExecutionTime }");
         Console.WriteLine(testExecution.Failure);
     });
-
-
-Console.ReadKey();
