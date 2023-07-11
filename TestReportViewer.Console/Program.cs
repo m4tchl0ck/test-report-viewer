@@ -1,8 +1,24 @@
+using System.IO.Compression;
 using TestReportViewer.Data.Memory;
 using TestReportViewer.xUnitTestReportLoader;
 
 const string FileArg = "-f";
 const string DirectoryArg = "-d";
+const string ZipFileArg = "-zf";
+
+async Task LoadFromZipFile(Loader loader, string zipFilePath, string filePattern = "*.*")
+{
+    if (!File.Exists(zipFilePath))
+    {
+        HandleWrongArgument("File not found");
+    }
+    
+    using var zip = ZipFile.OpenRead(zipFilePath);
+    var reportsPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    zip.ExtractToDirectory(reportsPath);
+    await LoadFromDirectory(loader, reportsPath, filePattern);
+    Directory.Delete(reportsPath);
+}
 
 async Task LoadFromDirectory(Loader loader, string reportsPath, string filePattern = "*.*")
 {
@@ -35,7 +51,8 @@ void HandleWrongArgument(string message = "wrong parameter")
 
 parameters
 {FileArg} <file>
-{DirectoryArg} <directory> <patter>"
+{DirectoryArg} <directory> <patter>
+{ZipFileArg} <file> <patter>"
     );
     throw new ArgumentException();
 }
@@ -56,6 +73,9 @@ switch (operation)
         break;
     case DirectoryArg:
         await LoadFromDirectory(loader, args[1], args[2]);
+        break;
+    case ZipFileArg:
+        await LoadFromZipFile(loader, args[1], args[2]);
         break;
     default:
         HandleWrongArgument();
