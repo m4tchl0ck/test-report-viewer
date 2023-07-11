@@ -9,4 +9,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="TestReportViewer.xUnitTestReportLoader.Tests" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TestReportViewer.Data\TestReportViewer.Data.csproj" />
+  </ItemGroup>
 </Project>
