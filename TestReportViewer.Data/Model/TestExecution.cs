@@ -6,4 +6,5 @@ public class TestExecution
     public TimeSpan ExecutionTime { get; set; }
     public string Result { get; set; }
     public DateTimeOffset ExecutedTimeStamp { get; set; }
+    public string Failure { get; set; }
 }

@@ -15,7 +15,8 @@ internal class Mapper
                     ExecutedTimeStamp = GetExecutionTimeStamp(assembly.RunDate, assembly.RunTime),
                     ExecutionTime = TimeSpan.FromSeconds(test.Time),
                     Name = test.Name,
-                    Result = test.Result
+                    Result = test.Result,
+                    Failure = test.Failure?.Message ?? string.Empty
                 })));
     }
 
