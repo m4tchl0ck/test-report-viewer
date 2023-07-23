@@ -1,1 +1,24 @@
 <p>test-executions-list works!</p>
+<div *ngIf="loading">Loading...</div>
+<div *ngIf="error">Error :(</div>
+<table *ngIf="data">
+    <caption>Test executions list</caption>
+    <thead>
+        <tr>
+            <th id="execution-time-stamp">Executed</th>
+            <th id="full-name">Full name</th>
+            <th id="result">Result</th>
+            <th id="execution-time">Execution time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let testExecution of data" id="test-execution-row">
+            <th id="execution_time_stamp">{{ testExecution.execution_time_stamp }}</th>
+            <th id="full-name">{{ testExecution.test_name }}</th>
+            <th id="result">{{ testExecution.result }}</th>
+            <th id="execution-time">{{ testExecution.execution_time }}</th>
+        </tr>
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>

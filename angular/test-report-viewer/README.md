@@ -35,5 +35,7 @@ Create file `src\.env.ts` and define class with variables
 export class Env {
     public static get GraphQLURL(): string 
     { return ''; }
+    public static get Hasura-Admin-Token(): string
+    { return ''; }
 }
 ```
